@@ -74,7 +74,7 @@
 \
 	RC_NODISCARD RC_FUN_ATTRIBUTES T* RC_ACQUIRE_NAME(T)(T * data) { \
 		RC_TYPENAME(T)* value = RC_GET_RC(T)(data); \
-		value->RC_STRUCT_RC_ENTRY_NAME(T).count++; \
+		(value->RC_STRUCT_RC_ENTRY_NAME(T).count)++; \
 \
 		return data; \
 	} \
@@ -82,19 +82,23 @@
 	RC_FUN_ATTRIBUTES void RC_FREE_NAME(T)(RC_TYPENAME(T) * value) { \
 		T* data = RC_GET_DATA(T)(value); \
 \
-		value->RC_STRUCT_RC_ENTRY_NAME(T).destroy(data); \
+		DESTRUCTOR_FN_NAME(T) destroy = value->RC_STRUCT_RC_ENTRY_NAME(T).destroy; \
+		if(destroy != NULL) { \
+			destroy(data); \
+		} \
+\
 		free(value); \
 	} \
 \
 	RC_FUN_ATTRIBUTES void RC_RELEASE_NAME(T)(T * data) { \
 		RC_TYPENAME(T)* value = RC_GET_RC(T)(data); \
-		volatile size_t* count = &(value->RC_STRUCT_RC_ENTRY_NAME(T).count); \
+		size_t* const count = &(value->RC_STRUCT_RC_ENTRY_NAME(T).count); \
 		/* not referenced, so just free it*/ \
 		if(*count == 0) { \
 			RC_FREE_NAME(T)(value); \
 			return; \
 		} \
-		*count--; \
+		--(*count); \
 		/* last reference released, free it */ \
 		if(*count == 0) { \
 			RC_FREE_NAME(T)(value); \
