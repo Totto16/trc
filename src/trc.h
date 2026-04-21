@@ -15,17 +15,17 @@
 
 // NOTE: this RC implementation is NOT MT thread safe!
 
-#define RC_TYPENAME(T) rc_##T
-#define RC_MALLOC_NAME(T) rc_##T##_malloc
-#define RC_RELEASE_NAME(T) rc_##T##_release
-#define RC_FREE_NAME(T) rc_##T##_free
-#define RC_ACQUIRE_NAME(T) rc_##T##_acquire
-#define RC_IMPL_STRUCT_NAME(T) rc_##T##_rc_struct_impl
-#define DESTRUCTOR_FN_NAME(T) rc_##T##_destructor_name
-#define RC_STRUCT_RC_ENTRY_NAME(T) rc_##T##_rc_struct_entry_impl
-#define RC_STRUCT_DATA_ENTRY_NAME(T) rc_##T##_data_struct_entry_impl
-#define RC_GET_DATA(T) rc_##T##_get_data
-#define RC_GET_RC(T) rc_##T##_get_rc
+#define RC_TYPENAME(T) __impl_struct_typename_rc_##T
+#define RC_MALLOC_NAME(T) rc_fn_##T##_malloc
+#define RC_RELEASE_NAME(T) rc_fn_##T##_release
+#define RC_FREE_NAME(T) __impl_fn_rc_##T##_free
+#define RC_ACQUIRE_NAME(T) rc_fn_##T##_acquire
+#define RC_IMPL_STRUCT_NAME(T) __impl_struct_rc_##T##_rc_struct_impl
+#define DESTRUCTOR_FN_NAME(T) __impl_fn_type_rc_##T##_destructor_name
+#define RC_STRUCT_RC_ENTRY_NAME(T) __impl_struct_entry_rc_##T##_rc_struct_entry_impl
+#define RC_STRUCT_DATA_ENTRY_NAME(T) __impl_struct_entry_rc_##T##_data_struct_entry_impl
+#define RC_GET_DATA(T) __impl_fn_rc_##T##_get_data
+#define RC_GET_RC(T) __impl_fn_rc_##T##_get_rc
 
 #define RC_FUN_ATTRIBUTES RC_MAYBE_UNUSED static inline
 
