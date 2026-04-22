@@ -1,5 +1,12 @@
 #pragma once
 
+// allocators
+
+#ifndef TRC_MALLOC
+	#define TRC_MALLOC(sz) malloc(sz)
+	#define TRC_FREE(p) free(p)
+#endif
+
 // util macros
 
 #if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202000) || __cplusplus
@@ -16,7 +23,7 @@
 // NOTE: this RC implementation is NOT MT thread safe!
 
 #define RC_TYPENAME(T) __impl_struct_typename_rc_##T
-#define RC_MALLOC_NAME(T) rc_fn_##T##_malloc
+#define RC_ALLOC_NAME(T) rc_fn_##T##_alloc
 #define RC_RELEASE_NAME(T) rc_fn_##T##_release
 #define RC_FREE_NAME(T) __impl_fn_rc_##T##_free
 #define RC_ACQUIRE_NAME(T) rc_fn_##T##_acquire
@@ -60,8 +67,8 @@
 		                                 offsetof(RC_TYPENAME(T), RC_STRUCT_DATA_ENTRY_NAME(T)))); \
 	} \
 \
-	RC_NODISCARD RC_FUN_ATTRIBUTES T* RC_MALLOC_NAME(T)(DESTRUCTOR_FN_NAME(T) destructor) { \
-		RC_TYPENAME(T)* result = malloc(sizeof(RC_TYPENAME(T))); \
+	RC_NODISCARD RC_FUN_ATTRIBUTES T* RC_ALLOC_NAME(T)(DESTRUCTOR_FN_NAME(T) destructor) { \
+		RC_TYPENAME(T)* result = TRC_MALLOC(sizeof(RC_TYPENAME(T))); \
 		if(result == NULL) { \
 			return NULL; \
 		} \
@@ -87,7 +94,7 @@
 			destroy(data); \
 		} \
 \
-		free(value); \
+		TRC_FREE(value); \
 	} \
 \
 	RC_FUN_ATTRIBUTES void RC_RELEASE_NAME(T)(T * data) { \
@@ -115,6 +122,6 @@
 	RC_POISON(RC_FREE_NAME(T)) \
 	RC_POISON(RC_IMPL_STRUCT_NAME(T))
 
-#define RC_MALLOC(T, destructor) RC_MALLOC_NAME(T)(destructor)
+#define RC_ALLOC(T, destructor) RC_ALLOC_NAME(T)(destructor)
 #define RC_ACQUIRE(T, data) RC_ACQUIRE_NAME(T)(data)
 #define RC_RELEASE(T, data) RC_RELEASE_NAME(T)(data)
